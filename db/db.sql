@@ -76,38 +76,3 @@ CREATE TABLE task_ratings (
 
 
 
-
--- SELECT 
---     t.id,
---     t.user_id,
---     t.delivery_id,
---     t.descripcion,
---     t.status,
---     t.timestamp,
---     t.priority,
---     JSON_AGG(
---         JSON_BUILD_OBJECT(
---             'task_id', R.task_id,
---             'delivery_id', R.delivery_id,
---             'rating', R.rating
---         )
---     ) AS ratings
--- FROM 
---     tasks AS t
--- INNER JOIN 
---     users AS u 
--- ON
---     t.user_id = u.id
--- LEFT JOIN
---     users AS d
--- ON 
---     t.delivery_id = d.id
--- LEFT JOIN 
---     task_ratings AS r
--- ON
---     r.task_id = t.id
--- WHERE
---     t.user_id = 9
---     AND t.status = 'ASIGNADO'
--- GROUP BY 	
---     t.id, t.user_id, t.delivery_id, t.descripcion, t.status, t.timestamp, t.priority;

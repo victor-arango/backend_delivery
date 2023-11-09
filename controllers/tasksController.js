@@ -33,11 +33,79 @@ module.exports = {
             }catch(error){
                 console.log(`Error ${error}`);
                 return res.status(501).json({
-                    message:'No se puedieron cargar las ordenes',
+                    message:'No se puedieron cargar las tareas',
                     error: error,
                     success: false
                 })
     
             }
-        }
+        },
+
+
+
+        async findByClientAndStatus(req, res, next) {
+            try {
+                const user_id = req.params.user_id;
+                const status = req.params.status;
+                const data = await Task.findByClientAndStatus(user_id, status);
+                console.log(data);
+                return res.status(201).json(data);
+            } catch(error) {
+                console.log(`Error ${error}`);
+                return res.status(501).json({
+                    message:'No se pudieron cargar las tareas',
+                    error: error,
+                    success: false
+                });
+            }
+        },
+        async findTaskById(req, res, next) {
+            try {
+                const id = req.params.id;
+                const data = await Task.findTaskById(id);
+        
+                if (!data) {
+                    return res.status(404).json({
+                        message: 'No se encontró la tarea',
+                        error: 'No encontrado',
+                        success: false
+                    });
+                }
+        
+                return res.status(201).json(data);
+            } catch (error) {
+                console.log(`Error ${error}`);
+                return res.status(501).json({
+                    message: 'Error en el servidor',
+                    error: error,
+                    success: false
+                });
+            }
+        },
+
+
+        async updateTask(req,res,next){
+            try {
+                    let task = req.body;
+                   
+                    
+                    const data = await Task.update(task);
+                    console.log(`Tarea Actualizada ${JSON.stringify(data)}`);
+    
+                    return res.status(201).json({
+                        message:'la tarea se actualizo correctamente  ',
+                        success: true,
+                    });
+    
+            } catch (error) {
+                console.log(`Error ${error}`);
+                return res.status(501).json({
+                    message:'se produjo un error al actualizar la orden',
+                    error: error,
+                    success: false
+                });
+            }
+        },
+        
+        
 }

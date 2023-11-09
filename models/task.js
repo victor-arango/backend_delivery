@@ -31,4 +31,112 @@ Task.create = (task) => {
   ]);
 };
 
+
+
+Task.findByClientAndStatus = (user_id, status) =>{
+    const sql = `      
+    SELECT 
+    t.id,
+    t.user_id,
+    t.delivery_id,
+    t.descripcion,
+    t.status,
+    t.timestamp,
+    t.priority,
+    (
+        SELECT JSON_BUILD_OBJECT(
+            'task_id', R.task_id,
+            'delivery_id', R.delivery_id,
+            'rating', R.rating
+        )
+        FROM task_ratings AS R
+        WHERE R.task_id = t.id
+        LIMIT 1
+    ) AS ratings
+FROM 
+    tasks AS t
+INNER JOIN 
+    users AS u 
+ON
+    t.user_id = u.id
+LEFT JOIN
+    users AS d
+ON 
+    t.delivery_id = d.id
+WHERE
+    t.user_id = $1
+    AND t.status = $2;
+
+    `;
+
+    return db.manyOrNone(sql,[user_id,status]);
+},
+
+
+
+Task.findTaskById = (id) =>{
+  const sql = `
+  SELECT 
+  t.id,
+  t.user_id,
+  t.delivery_id,
+  t.descripcion,
+  t.status,
+  t.timestamp,
+  t.priority,
+  JSON_BUILD_OBJECT(
+      'task_id', R.task_id,
+      'delivery_id', R.delivery_id,
+      'rating', R.rating
+  ) AS ratings
+FROM 
+  tasks AS t
+INNER JOIN 
+  users AS u 
+  ON t.user_id = u.id
+LEFT JOIN
+  users AS d
+  ON t.delivery_id = d.id
+LEFT JOIN
+  task_ratings AS R
+  ON t.id = R.task_id
+WHERE
+  t.id = $1;
+
+  `;
+  return db.oneOrNone(sql,[id]);
+
+}
+
+
+
+Task.update = (task)=>{
+  const sql = `
+      UPDATE
+          tasks
+      SET 
+      descripcion=$2,
+      timestamp =$3,
+      delivery_id=$4,
+      priority =$5,
+      updated_at=$6
+      WHERE 
+          id= $1
+  `;
+
+  return db.none(sql,[
+      Task.id,
+      Task.descripcion,
+      Task.timestamp,
+      Task.delivery_id,
+      Task.priority,
+      new Date(),
+
+  ]);
+}
+
+
+
+
+
 module.exports = Task;
