@@ -109,31 +109,33 @@ WHERE
 }
 
 
-
-Task.update = (task)=>{
+Task.update = (task) => {
   const sql = `
       UPDATE
           tasks
       SET 
-      descripcion=$2,
-      timestamp =$3,
-      delivery_id=$4,
-      priority =$5,
-      updated_at=$6
+          descripcion=$2,
+          timestamp=$3,
+          delivery_id=$4,
+          priority=$5,
+          updated_at=$6
       WHERE 
-          id= $1
+          id=$1
+      RETURNING *
   `;
 
-  return db.none(sql,[
-      Task.id,
-      Task.descripcion,
-      Task.timestamp,
-      Task.delivery_id,
-      Task.priority,
+  return db.one(sql, [
+      task.id,
+      task.descripcion,
+      task.timestamp,
+      task.delivery_id,
+      task.priority,
       new Date(),
-
   ]);
-}
+};
+
+
+
 
 
 

@@ -29,6 +29,6 @@ app.get('/api/task/findTaskById/:id',tasksController.findTaskById);
 */
 
 
-app.put('/api/task/updateTask', tasksController.updateTask);
+app.patch('/api/task/:id', tasksController.updateTask);
 }
 

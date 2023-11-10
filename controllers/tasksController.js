@@ -83,29 +83,29 @@ module.exports = {
             }
         },
 
-
-        async updateTask(req,res,next){
+        async updateTask(req, res, next) {
             try {
-                    let task = req.body;
-                   
-                    
-                    const data = await Task.update(task);
-                    console.log(`Tarea Actualizada ${JSON.stringify(data)}`);
-    
-                    return res.status(201).json({
-                        message:'la tarea se actualizo correctamente  ',
-                        success: true,
-                    });
-    
+                let task = req.body;
+        
+        
+                const updatedTask = await Task.update(task);
+        
+                return res.status(201).json({
+                    message: 'La tarea se actualizó correctamente',
+                    success: true,
+                    data: updatedTask,
+                });
+        
             } catch (error) {
                 console.log(`Error ${error}`);
                 return res.status(501).json({
-                    message:'se produjo un error al actualizar la orden',
+                    message: 'Se produjo un error al actualizar la orden',
                     error: error,
                     success: false
                 });
             }
-        },
+        }
+        
         
         
 }

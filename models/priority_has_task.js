@@ -10,7 +10,6 @@ PriorityHasTask.create = (task_id,delivery_id, rating)=>{
     const sql = `
         INSERT INTO
         task_ratings(
-                
                 task_id,
                 delivery_id,
                 rating,
