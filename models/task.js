@@ -121,7 +121,7 @@ Task.update = (task) => {
           updated_at=$6
       WHERE 
           id=$1
-      RETURNING *
+          RETURNING id, user_id, delivery_id, descripcion, status, priority, timestamp
   `;
 
   return db.one(sql, [
@@ -137,7 +137,19 @@ Task.update = (task) => {
 
 
 
-
+Task.findRatingTaskById = (id) => {
+  const sql = `
+    SELECT 
+        COALESCE(R.rating, 0) AS rating
+    FROM 
+        tasks AS t
+    LEFT JOIN 
+        task_ratings AS R ON t.id = R.task_id
+    WHERE 
+        t.id = $1;
+  `;
+  return db.oneOrNone(sql, [id]);
+}
 
 
 

@@ -1,5 +1,6 @@
 const Task = require('../models/task');
 const PriorityHasTask = require('../models/priority_has_task');
+const { json } = require('express');
 
 
 
@@ -48,7 +49,6 @@ module.exports = {
                 const user_id = req.params.user_id;
                 const status = req.params.status;
                 const data = await Task.findByClientAndStatus(user_id, status);
-                console.log(data);
                 return res.status(201).json(data);
             } catch(error) {
                 console.log(`Error ${error}`);
@@ -86,10 +86,14 @@ module.exports = {
         async updateTask(req, res, next) {
             try {
                 let task = req.body;
-        
-        
+                let idTask = task.id;
                 const updatedTask = await Task.update(task);
-        
+                const rating = await Task.findRatingTaskById(idTask);
+                updatedTask.ratings = {
+                    task_id: idTask,
+                    delivery_id: task.delivery_id,
+                    rating: rating ? rating.rating : "0"
+                };
                 return res.status(201).json({
                     message: 'La tarea se actualizó correctamente',
                     success: true,
@@ -97,7 +101,7 @@ module.exports = {
                 });
         
             } catch (error) {
-                console.log(`Error ${error}`);
+                console.error(`Error en updateTask: ${error}`);
                 return res.status(501).json({
                     message: 'Se produjo un error al actualizar la orden',
                     error: error,
@@ -105,7 +109,6 @@ module.exports = {
                 });
             }
         }
-        
         
         
 }

@@ -10,7 +10,6 @@ module.exports = {
     async getAll(req,res,next){
         try{
             const data = await User.getAll();
-            console.log(`Usuarios: ${data}`);
             return res.status(201).json(data);
         }
         catch(error){
@@ -76,7 +75,6 @@ module.exports = {
                 }
                 // await User.updateToken(myUser.id, `JWT ${token}`);
 
-                console.log(`USUARIO LOGUEADO : ${data}`);
                
                 return res.status(201).json({
                     success: true,
@@ -156,7 +154,6 @@ module.exports = {
             const id = req.params.id;
 
             const data = await User.findByDeliveryMen();
-            console.log(`Usuario: ${JSON.stringify(data)}`);
             return res.status(201).json(data);
         }
         catch(error){
