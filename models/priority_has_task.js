@@ -16,10 +16,10 @@ PriorityHasTask.create = (task_id,delivery_id, rating)=>{
                 created_at,
                 updated_at
             )
-        VALUES($1,$2,$3,$4,$5) 
+        VALUES($1,$2,$3,$4,$5) RETURNING task_id, delivery_id, rating;
     `;
 
-    return db.none(sql,[
+    return db.oneOrNone(sql,[
         
         task_id,
         delivery_id,
@@ -29,5 +29,19 @@ PriorityHasTask.create = (task_id,delivery_id, rating)=>{
     ])
 }
 
+
+PriorityHasTask.updateRating = (task_id, rating) => {
+    const sql = `
+     
+    UPDATE task_ratings
+    SET rating = $2,
+      updated_at = $3
+    WHERE task_id = 48
+    RETURNING *;
+    `;
+    console.log('SQL:', sql); // Imprime la consulta SQL
+  
+    return db.oneOrNone(sql, [task_id, rating, new Date()]);
+  };
 
 module.exports = PriorityHasTask;

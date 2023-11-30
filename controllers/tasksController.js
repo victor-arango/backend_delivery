@@ -8,40 +8,50 @@ const { json } = require('express');
 module.exports = {
 
 
-        async create(req, res, next){
-
-            try {
-
-                let task = req.body;
-                task.status = 'ASIGNADO';
-
-                console.log(task);
-                const data = await Task.create(task);
-
-                const rating = 0;
-
-                await PriorityHasTask.create(data.id, data.delivery_id, rating);
-
-
-                return res.status(201).json({
-                    message:'se creo correctamente la tarea',
-                    succes: true,
-                    data: data
-                })
-
-
-
-            }catch(error){
-                console.log(`Error ${error}`);
-                return res.status(501).json({
-                    message:'No se puedieron cargar las tareas',
-                    error: error,
-                    success: false
-                })
-    
-            }
-        },
-
+    async create(req, res, next) {
+        try {
+          const task = req.body;
+          
+          // Establece el estado de la tarea en 'ASIGNADO'
+          task.status = 'ASIGNADO';
+          
+          // Crea la tarea en la base de datos
+          const createdTask = await Task.create(task);
+          
+          const task_id = parseInt(createdTask.id); 
+          const delivery_id = parseInt(createdTask.delivery_id);
+      
+          // Crea la prioridad para la tarea
+          const rating = 0;
+          const ratings = await PriorityHasTask.create(task_id,delivery_id, rating);
+      
+          // Construye la respuesta a enviar al cliente
+          const responseData = {
+            data: {
+              ...createdTask, 
+              ratings: ratings,
+            },
+          };
+      
+          console.log(responseData);
+      
+          // Envía la respuesta al cliente
+          return res.status(201).json({
+            message: 'Se creó correctamente la tarea',
+            success: true,
+            data: responseData.data,
+          });
+        } catch (error) {
+          console.error(`Error: ${error.message}`);
+          return res.status(500).json({
+            message: 'No se pudieron cargar las tareas',
+            error: error.message,
+            success: false,
+          });
+        }
+      },
+      
+      
 
 
         async findByClientAndStatus(req, res, next) {
@@ -49,6 +59,11 @@ module.exports = {
                 const user_id = req.params.user_id;
                 const status = req.params.status;
                 const data = await Task.findByClientAndStatus(user_id, status);
+                const idTask = data.task_id; 
+                const rating = await Task.findRatingTaskById(idTask);
+
+
+
                 return res.status(201).json(data);
             } catch(error) {
                 console.log(`Error ${error}`);
@@ -85,30 +100,91 @@ module.exports = {
 
         async updateTask(req, res, next) {
             try {
-                let task = req.body;
-                let idTask = task.id;
-                const updatedTask = await Task.update(task);
-                const rating = await Task.findRatingTaskById(idTask);
-                updatedTask.ratings = {
-                    task_id: idTask,
-                    delivery_id: task.delivery_id,
-                    rating: rating ? rating.rating : "0"
-                };
-                return res.status(201).json({
-                    message: 'La tarea se actualizó correctamente',
-                    success: true,
-                    data: updatedTask,
-                });
-        
+              let task = { ...req.body };
+          
+              // Obtén el ID de los parámetros de la URL
+              const taskId = req.params.id;
+              task.id = taskId;
+          
+              // Actualiza la tarea utilizando el ID de la URL
+              const updatedTask = await Task.update(task);
+          
+              // Utiliza el ID de la URL para buscar el rating
+              const rating = await Task.findRatingTaskById(taskId);
+          
+              // Combina la información de updatedTask y rating en un solo objeto
+              const responseData = {
+                ...updatedTask,
+                ratings: {
+                  task_id: rating.task_id,
+                  delivery_id: rating.delivery_id,
+                  rating: rating.rating,
+                },
+              };
+          
+              console.log(JSON.stringify(responseData));
+          
+              return res.status(201).json({
+                message: 'La tarea se actualizó correctamente',
+                success: true,
+                data: responseData,
+              });
             } catch (error) {
-                console.error(`Error en updateTask: ${error}`);
-                return res.status(501).json({
-                    message: 'Se produjo un error al actualizar la orden',
-                    error: error,
-                    success: false
-                });
+              console.error(`Error en updateTask: ${error}`);
+              return res.status(501).json({
+                message: 'Se produjo un error al actualizar la orden',
+                error: error,
+                success: false,
+              });
             }
-        }
+          },
+
+
+          async updateTaskAndRating(req, res, next) {
+            try {
+              let task = { ...req.body };
+          
+              // Obtén el ID de los parámetros de la URL
+              const taskId = req.params.id;
+              const valueRating = parseInt(req.params.rating, 10); // Convierte el valor a un entero
+              const status = 'CERRADO';
+
+              
+              // Actualiza la tarea utilizando el ID de la URL
+              const updatedTask = await Task.updateFinish(taskId, status);
+              
+              console.log(`Este es el valor de Rating ${valueRating}`);
+              console.log(`Este es el valor de TASKID ${taskId}`);
+              // Verifica si la actualización del rating fue exitosa antes de continuar
+              const rating = await PriorityHasTask.updateRating(taskId, valueRating);
+
+              console.log(JSON.stringify(rating));
+              
+          
+              const responseData = {
+                data: {
+                  ...updatedTask,
+                  ratings: rating,
+                },
+              };
+          
+              return res.status(201).json({
+                message: 'Tarea Finalizada',
+                success: true,
+                data: responseData,
+              });
+            } catch (error) {
+              console.error(`Error en updateTask: ${error}`);
+              return res.status(501).json({
+                message: 'Se produjo un error al finalizar la tarea',
+                error: error.message, // Devolver solo el mensaje de error
+                success: false,
+              });
+            }
+          }
+          
+          
+          
         
         
 }

@@ -124,7 +124,7 @@ Task.update = (task) => {
           RETURNING id, user_id, delivery_id, descripcion, status, priority, timestamp
   `;
 
-  return db.one(sql, [
+  return db.oneOrNone(sql, [
       task.id,
       task.descripcion,
       task.timestamp,
@@ -135,12 +135,28 @@ Task.update = (task) => {
 };
 
 
+Task.updateFinish = (id, status) => {
+  const sql = `
+    UPDATE tasks
+    SET status = $2
+    WHERE id = $1
+    RETURNING id, user_id, delivery_id, descripcion, status, priority, timestamp
+  `;
+
+  return db.oneOrNone(sql, [id, status]);
+};
+
+
 
 
 Task.findRatingTaskById = (id) => {
   const sql = `
     SELECT 
-        COALESCE(R.rating, 0) AS rating
+        R.task_id,
+        R.delivery_id,
+        R.rating,
+        R.created_at,
+        R.updated_at
     FROM 
         tasks AS t
     LEFT JOIN 
@@ -149,8 +165,6 @@ Task.findRatingTaskById = (id) => {
         t.id = $1;
   `;
   return db.oneOrNone(sql, [id]);
-}
-
-
+};
 
 module.exports = Task;
