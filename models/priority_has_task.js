@@ -37,9 +37,8 @@ PriorityHasTask.updateRating = (task_id, rating) => {
     SET rating = $2,
       updated_at = $3
     WHERE task_id = 48
-    RETURNING *;
+    RETURNING task_id, delivery_id, rating;
     `;
-    console.log('SQL:', sql); // Imprime la consulta SQL
   
     return db.oneOrNone(sql, [task_id, rating, new Date()]);
   };

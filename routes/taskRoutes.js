@@ -29,7 +29,7 @@ app.get('/api/task/findTaskById/:id',tasksController.findTaskById);
 */
 
 
-// app.patch('/api/task/:id', tasksController.updateTask);
+app.patch('/api/task/:id', tasksController.updateTask);
 app.patch('/api/task/updateTaskByIdAndStatus/:id/:rating',tasksController.updateTaskAndRating);
 }
 

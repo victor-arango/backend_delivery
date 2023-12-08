@@ -114,3 +114,4 @@ User.isPasswordMatched = (userPassword, hash) =>{
     return false;
 }
 module.exports = User;
+

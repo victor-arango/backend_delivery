@@ -109,6 +109,8 @@ module.exports = {
     // Función para verificar el token Bearer y devolver el usuario con un nuevo token
     async checkAuthStatus(req, res) {
         const token = req.headers['authorization'];
+
+        console.log(token);
         
         if (!token) {
             return res.status(401).json({
