@@ -148,25 +148,29 @@ module.exports = {
               const taskId = req.params.id;
               const valueRating = parseInt(req.params.rating, 10); // Convierte el valor a un entero
               const status = 'CERRADO';
-
-              
+          
               // Actualiza la tarea utilizando el ID de la URL
               const updatedTask = await Task.updateFinish(taskId, status);
-              
-              console.log(`Este es el valor de Rating ${valueRating}`);
-              console.log(`Este es el valor de TASKID ${taskId}`);
-              // Verifica si la actualización del rating fue exitosa antes de continuar
-              const rating = await PriorityHasTask.updateRating(taskId, valueRating);
-
-              console.log(JSON.stringify(rating));
-              
           
+              const rating = await PriorityHasTask.updateRating(taskId, valueRating);
+          
+              // Crear el objeto de respuesta con el formato deseado
               const responseData = {
-                data: {
-                  ...updatedTask,
-                  ratings: rating,
+                id: updatedTask.id,
+                user_id: updatedTask.user_id,
+                delivery_id: updatedTask.delivery_id,
+                descripcion: updatedTask.descripcion,
+                status: updatedTask.status,
+                timestamp: updatedTask.timestamp,
+                priority: updatedTask.priority,
+                ratings: {
+                  task_id: taskId,
+                  delivery_id: updatedTask.delivery_id,
+                  rating: valueRating,
                 },
               };
+          
+              console.log(JSON.stringify(responseData));
           
               return res.status(201).json({
                 message: 'Tarea Finalizada',
@@ -182,6 +186,7 @@ module.exports = {
               });
             }
           }
+          
           
           
           
