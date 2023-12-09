@@ -185,7 +185,28 @@ module.exports = {
                 success: false,
               });
             }
-          }
+          },
+
+          async findByDeliveryAndStatus(req, res, next) {
+            try {
+                const user_id = req.params.user_id; // Corregir aquí
+                const status = req.params.status;
+        
+                
+        
+                const data = await Task.findTaskByDeliveryIdAndStatus(user_id, status);
+        
+                return res.status(201).json(data);
+            } catch(error) {
+                console.log(`Error ${error}`);
+                return res.status(501).json({
+                    message: 'No se pudieron cargar las tareas',
+                    error: error,
+                    success: false
+                });
+            }
+        },
+        
           
           
           

@@ -21,6 +21,7 @@ app.post('/api/task/create',tasksController.create);
 
 app.get('/api/task/findByClientAndStatus/:user_id/:status',tasksController.findByClientAndStatus);
 app.get('/api/task/findTaskById/:id',tasksController.findTaskById);
+app.get('/api/task/findByDeliveryAndStatus/:user_id/:status',tasksController.findByDeliveryAndStatus);
 
 
 

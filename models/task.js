@@ -167,4 +167,34 @@ Task.findRatingTaskById = (id) => {
   return db.oneOrNone(sql, [id]);
 };
 
+
+Task.findTaskByDeliveryIdAndStatus = (id,status) =>{
+  const sql = `
+  SELECT 
+  id,
+  user_id,
+  delivery_id,
+  descripcion,
+  status,
+  timestamp,
+  priority
+FROM 
+  tasks
+  WHERE
+    delivery_id = $1 AND status = $2
+  ORDER BY
+    CASE priority
+      WHEN 'ALTA' THEN 1
+      WHEN 'MEDIA' THEN 2
+      WHEN 'BAJA' THEN 3
+      ELSE 4
+    END;
+
+`;
+
+  return db.many(sql,[id,status]);
+
+}
+
+
 module.exports = Task;
