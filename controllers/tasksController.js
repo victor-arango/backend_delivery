@@ -207,6 +207,51 @@ module.exports = {
             }
         },
         
+
+
+        async updateTaskDelivery(req, res, next) {
+          try {
+            let task = { ...req.body };
+
+
+
+            console.log(task);
+        
+            // Obtén el ID de los parámetros de la URL
+            const taskId = req.params.id;
+            const status = 'FINALIZADO';
+        
+            // Actualiza la tarea utilizando el ID de la URL
+            const updatedTask = await Task.updateFinish(taskId, status);
+        
+        
+            const responseData = {
+              id: updatedTask.id,
+              user_id: updatedTask.user_id,
+              delivery_id: updatedTask.delivery_id,
+              descripcion: updatedTask.descripcion,
+              status: updatedTask.status,
+              timestamp: updatedTask.timestamp,
+              priority: updatedTask.priority,
+            };
+        
+            console.log(JSON.stringify(responseData));
+        
+            return res.status(201).json({
+              message: 'Tarea Finalizada',
+              success: true,
+              data: responseData,
+            });
+          } catch (error) {
+            console.error(`Error en updateTask: ${error}`);
+            return res.status(501).json({
+              message: 'Se produjo un error al finalizar la tarea',
+              error: error.message, // Devolver solo el mensaje de error
+              success: false,
+            });
+          }
+        },
+
           
           
           

@@ -184,9 +184,9 @@ FROM
     delivery_id = $1 AND status = $2
   ORDER BY
     CASE priority
-      WHEN 'ALTA' THEN 1
-      WHEN 'MEDIA' THEN 2
-      WHEN 'BAJA' THEN 3
+      WHEN 'Alta' THEN 1
+      WHEN 'Media' THEN 2
+      WHEN 'Baja' THEN 3
       ELSE 4
     END;
 

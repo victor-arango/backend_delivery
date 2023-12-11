@@ -32,6 +32,7 @@ app.get('/api/task/findByDeliveryAndStatus/:user_id/:status',tasksController.fin
 
 app.patch('/api/task/:id', tasksController.updateTask);
 app.patch('/api/task/updateTaskByIdAndStatus/:id/:rating',tasksController.updateTaskAndRating);
+app.patch('/api/task/updateFinishTaskById/:id',tasksController.updateTaskDelivery);
 }
 
 
