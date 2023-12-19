@@ -56,7 +56,7 @@ users(app);
 task(app);
 
 
-server.listen(3000, '192.168.1.4' || 'localhost', function () {
+server.listen(3000, '192.168.10.187' || 'localhost', function () {
   console.log('se inicio la aplicacion de manera correcta ' + port + ' se inicio...');
 });
 //Manejo de error 

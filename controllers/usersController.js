@@ -3,7 +3,8 @@ const User = require('../models/user');
 const Rol = require('../models/rol');
 const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
-const { use } = require('passport');
+// const verifyToken = require('../middleware/authenticate');
+// const { use } = require('passport');
 
 module.exports = {
 
@@ -57,14 +58,14 @@ module.exports = {
             if(!myUser){
                 return res.status(401).json({
                     success:false,
-                    message:'El usuario no fue encontrado en la base de datos'
+                    message:'El usuario o contrasela es incorrecta'
                 });
             }
 
             if(User.isPasswordMatched(password, myUser.password)){
                 const token = jwt.sign({id:myUser.id,email:myUser.email}, keys.secretOrKey,{
-                    // expiresIn: (60*60*24) //el token expira cada Hora
-                    expiresIn: (60*1) //el token expira cada minuto
+                    expiresIn: (60*60*24) //el token expira cada Hora
+                    // expiresIn: (60*1) //el token expira cada minuto
                 });
                 const data = {
                     id: myUser.id,
@@ -73,7 +74,7 @@ module.exports = {
                     session_token:token,
                     roles:myUser.roles
                 }
-                // await User.updateToken(myUser.id, `JWT ${token}`);
+                await User.updateToken(myUser.id, token);
 
                
                 return res.status(201).json({
@@ -88,7 +89,7 @@ module.exports = {
             else{
                 return res.status(401).json({
                     success:false,
-                    message:'La contraseña es incorrecta',
+                    message:'El usuario o contrasela es incorrecta',
                    
 
                 })
@@ -108,15 +109,18 @@ module.exports = {
 
     // Función para verificar el token Bearer y devolver el usuario con un nuevo token
     async checkAuthStatus(req, res) {
-        const token = req.headers['authorization'];
+        const authHeader = req.headers["authorization"];
+
+        const token = authHeader;
 
         console.log(token);
-        
         if (!token) {
             return res.status(401).json({
                 success: false,
                 message: 'Token no proporcionado en la solicitud',
             });
+
+            
         }
     
         const user = verifyToken(token);
@@ -170,12 +174,44 @@ module.exports = {
 }
     
 
- // Función para verificar el token Bearer y extraer el usuario
- function verifyToken(authorizationHeader) {
+// Middleware para verificar el token Bearer
+function authenticateToken(req, res, next) {
+    const token = req.headers['authorization'];
+  
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token no proporcionado en la solicitud',
+      });
+    }
+  
+    const user = verifyToken(token);
+  
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token inválido o sesión expirada',
+      });
+    }
+  
+    req.user = user;
+    next();
+  }
+  
+  // Función para firmar un nuevo token JWT
+  function getJwtToken(payload) {
+    const token = jwt.sign(payload, keys.secretOrKey); // Usar keys.secretOrKey
+    return token;
+  }
+
+
+  function verifyToken(authorizationHeader) {
     if (typeof authorizationHeader !== 'undefined') {
       const bearerToken = authorizationHeader.split(' ')[1];
+      console.log(`BEARER TOKENT  ${bearerToken}`);
       try {
-        const decoded = jwt.verify(bearerToken, keys.secretOrKey); // Usar keys.secretOrKey
+        const decoded = jwt.verify(bearerToken, keys.secretOrKey); // Ajusta la clave según tu configuración
+        console.log(`DECODED ${decoded}` );
         return decoded;
       } catch (err) {
         return null;
@@ -185,8 +221,3 @@ module.exports = {
     }
   }
   
-  // Función para firmar un nuevo token JWT
-  function getJwtToken(payload) {
-    const token = jwt.sign(payload, keys.secretOrKey); // Usar keys.secretOrKey
-    return token;
-  }

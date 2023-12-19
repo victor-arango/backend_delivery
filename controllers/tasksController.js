@@ -189,11 +189,10 @@ module.exports = {
 
           async findByDeliveryAndStatus(req, res, next) {
             try {
-                const user_id = req.params.user_id; // Corregir aquí
+                const user_id = req.params.user_id; 
                 const status = req.params.status;
         
                 
-        
                 const data = await Task.findTaskByDeliveryIdAndStatus(user_id, status);
         
                 return res.status(201).json(data);
